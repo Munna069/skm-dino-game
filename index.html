@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Dino Premium Runner</title>
+  <style>
+    body, html {
+      margin: 0;
+      overflow: hidden;
+      background: #f0e4d7;
+      font-family: sans-serif;
+    }
+    canvas {
+      display: block;
+    }
+    #ui, #codeInput, #contactInfo {
+      position: absolute;
+      z-index: 10;
+    }
+    #ui {
+      top: 10px;
+      left: 10px;
+    }
+    #crown {
+      background: gold;
+      border: none;
+      padding: 10px;
+      cursor: pointer;
+      font-weight: bold;
+      border-radius: 5px;
+    }
+    #codeInput {
+      top: 60px;
+      left: 10px;
+      background: white;
+      padding: 10px;
+      border: 1px solid gray;
+      display: none;
+    }
+    #contactInfo {
+      bottom: 10px;
+      left: 10px;
+      background: #fff;
+      padding: 10px;
+      border: 1px solid #ccc;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+<div id="ui">
+  <button id="crown">👑 Premium</button>
+</div>
+
+<div id="codeInput">
+  <label>প্রিমিয়াম কোড দিন:</label><br>
+  <input type="text" id="codeBox">
+  <button onclick="checkCode()">Unlock</button>
+</div>
+
+<div id="contactInfo">
+  <p>WhatsApp: <a href="https://wa.me/8801604677795">+8801604677795</a></p>
+  <p>Bkash: whatsapp করেন পেয়ে যাবেন</p>
+  <p>কোড নিতে চাইলে WhatsApp করো</p>
+</div>
+
+<canvas id="gameCanvas" width="800" height="400"></canvas>
+
+<script>
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+let gameRunning = true;
+let score = 0;
+let premium = false;
+let speed = 2;
+let playerImg = new Image();
+let obstacleImg = new Image();
+let bgImg = new Image();
+
+function setGraphics() {
+  if (premium) {
+    playerImg.src = 'https://i.ibb.co/hZkWYyP/robot.png';
+    obstacleImg.src = 'https://i.ibb.co/yfBKr3x/spike.png';
+    bgImg.src = 'https://i.ibb.co/ZhLh8cM/premium-bg.jpg';
+  } else {
+    playerImg.src = 'https://i.ibb.co/XJQkRM7/dino.png';
+    obstacleImg.src = 'https://i.ibb.co/q1qG1wm/cactus.png';
+    bgImg.src = 'https://i.ibb.co/fC5t0zW/desert-bg.jpg';
+  }
+}
+
+document.getElementById('crown').onclick = () => {
+  gameRunning = false;
+  document.getElementById('codeInput').style.display = 'block';
+  document.getElementById('contactInfo').style.display = 'block';
+};
+
+function checkCode() {
+  const code = document.getElementById('codeBox').value.trim();
+  if (["134", "628", "356"].includes(code)) {
+    premium = true;
+    setGraphics();
+    gameRunning = true;
+    document.getElementById('codeInput').style.display = 'none';
+    document.getElementById('contactInfo').style.display = 'none';
+  } else {
+    alert("ভুল কোড!");
+  }
+}
+
+setGraphics();
+
+let player = {x: 50, y: 300, w: 40, h: 40, vy: 0, jump: false};
+let obstacles = [];
+
+document.body.onclick = () => {
+  if (gameRunning && !player.jump) {
+    player.vy = -10;
+    player.jump = true;
+  }
+};
+
+function addObstacle() {
+  obstacles.push({x: canvas.width, y: 320, w: 30, h: 40});
+}
+setInterval(() => {
+  if (gameRunning) addObstacle();
+}, 2000);
+
+function gameLoop() {
+  if (!gameRunning) return requestAnimationFrame(gameLoop);
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height);
+
+  // Player physics
+  player.y += player.vy;
+  player.vy += 0.6;
+  if (player.y >= 300) {
+    player.y = 300;
+    player.vy = 0;
+    player.jump = false;
+  }
+  ctx.drawImage(playerImg, player.x, player.y, player.w, player.h);
+
+  // Obstacles
+  for (let i = 0; i < obstacles.length; i++) {
+    let obs = obstacles[i];
+    obs.x -= speed;
+    ctx.drawImage(obstacleImg, obs.x, obs.y, obs.w, obs.h);
+
+    // Collision
+    if (player.x < obs.x + obs.w &&
+        player.x + player.w > obs.x &&
+        player.y < obs.y + obs.h &&
+        player.y + player.h > obs.y) {
+      alert("Game Over!");
+      location.reload();
+    }
+  }
+
+  // Score increase
+  score++;
+  if (score % 100 === 0) speed += 0.5;
+
+  requestAnimationFrame(gameLoop);
+}
+
+gameLoop();
+</script>
+
+</body>
+</html>
