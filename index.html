@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bn">
 <head>
   <meta charset="UTF-8">
   <title>Dino Premium Runner</title>
@@ -13,12 +13,12 @@
     canvas {
       display: block;
     }
-    #ui, #codeInput, #contactInfo {
+    #ui, #codeInput, #contactInfo, #resetButton, #featureCards, #socialBar, #rotateInfo {
       position: absolute;
       z-index: 10;
     }
     #ui {
-      top: 10px;
+      top: 50px;
       left: 10px;
     }
     #crown {
@@ -30,7 +30,7 @@
       border-radius: 5px;
     }
     #codeInput {
-      top: 60px;
+      top: 100px;
       left: 10px;
       background: white;
       padding: 10px;
@@ -45,9 +45,85 @@
       border: 1px solid #ccc;
       display: none;
     }
+    #rotateInfo {
+      top: 10px;
+      right: 10px;
+      background: #ffeeba;
+      border: 1px solid #f0ad4e;
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+    #resetButton {
+      top: 190px;
+      left: 10px;
+      background-color: #4CAF50;
+      color: white;
+      padding: 15px;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+      border-radius: 5px;
+      display: none;
+    }
+
+    #featureCards {
+      display: none;
+      top: 130px;
+      left: 10px;
+      background: rgba(255,255,255,0.9);
+      padding: 10px;
+      border-radius: 10px;
+      width: 300px;
+    }
+    .card {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      padding: 8px;
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+    }
+    .card img {
+      width: 50px;
+      height: 50px;
+      border-radius: 5px;
+    }
+    .card-text {
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    #socialBar {
+      top: 0;
+      width: 100%;
+      background: #222;
+      color: #fff;
+      text-align: center;
+      padding: 6px 0;
+      font-size: 14px;
+      z-index: 20;
+    }
+    #socialBar a {
+      color: #00ffcc;
+      text-decoration: none;
+      margin: 0 10px;
+      font-weight: bold;
+    }
+    #socialBar a:hover {
+      text-decoration: underline;
+    }
   </style>
 </head>
 <body>
+
+<div id="socialBar">
+  <a href="https://www.facebook.com/share/17h41dqbRS/?mibextid=qi2Omg" target="_blank">Facebook</a> |
+  <a href="https://www.youtube.com/@sniper_king_munna100" target="_blank">YouTube</a> |
+  <a href="https://www.tiktok.com/@sniper_king_munna100" target="_blank">TikTok</a>
+</div>
 
 <div id="ui">
   <button id="crown">👑 Premium</button>
@@ -57,13 +133,25 @@
   <label>প্রিমিয়াম কোড দিন:</label><br>
   <input type="text" id="codeBox">
   <button onclick="checkCode()">Unlock</button>
+  <p style="margin-top: 8px; font-size: 14px; color: #333;">
+    কোড চাইলে WhatsApp করো: <br>
+    <a href="https://wa.me/8801604677795" target="_blank" style="color: green; font-weight: bold;">
+      +8801604677795
+    </a>
+  </p>
 </div>
 
 <div id="contactInfo">
   <p>WhatsApp: <a href="https://wa.me/8801604677795">+8801604677795</a></p>
-  <p>Bkash: whatsapp করেন পেয়ে যাবেন</p>
+  <p>Bkash: whatsapp করেন পেয়ে যাবেন</p>
   <p>কোড নিতে চাইলে WhatsApp করো</p>
 </div>
+
+<div id="rotateInfo">
+  <strong>মনে রাখবেন:</strong> ভালো খেলার জন্য <b>ফোনটি রুট (Rotate)</b> করে ধরুন!
+</div>
+
+<button id="resetButton" onclick="resetGame()">রিসেট করুন</button>
 
 <canvas id="gameCanvas" width="800" height="400"></canvas>
 
@@ -80,13 +168,13 @@ let bgImg = new Image();
 
 function setGraphics() {
   if (premium) {
-    playerImg.src = 'https://i.ibb.co/hZkWYyP/robot.png';
-    obstacleImg.src = 'https://i.ibb.co/yfBKr3x/spike.png';
-    bgImg.src = 'https://i.ibb.co/ZhLh8cM/premium-bg.jpg';
+    playerImg.src = 'https://i.imgur.com/t6ZYev2.png';
+    obstacleImg.src = 'https://i.imgur.com/3wMYA2V.png';
+    bgImg.src = 'https://i.imgur.com/lkyKfud.jpg';
   } else {
-    playerImg.src = 'https://i.ibb.co/XJQkRM7/dino.png';
-    obstacleImg.src = 'https://i.ibb.co/q1qG1wm/cactus.png';
-    bgImg.src = 'https://i.ibb.co/fC5t0zW/desert-bg.jpg';
+    playerImg.src = 'https://i.imgur.com/Vs77ReU.png';
+    obstacleImg.src = 'https://i.imgur.com/smYcQpz.png';
+    bgImg.src = 'https://i.imgur.com/GzRXAIp.jpg';
   }
 }
 
@@ -134,7 +222,6 @@ function gameLoop() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height);
 
-  // Player physics
   player.y += player.vy;
   player.vy += 0.6;
   if (player.y >= 300) {
@@ -144,27 +231,44 @@ function gameLoop() {
   }
   ctx.drawImage(playerImg, player.x, player.y, player.w, player.h);
 
-  // Obstacles
   for (let i = 0; i < obstacles.length; i++) {
     let obs = obstacles[i];
     obs.x -= speed;
     ctx.drawImage(obstacleImg, obs.x, obs.y, obs.w, obs.h);
 
-    // Collision
     if (player.x < obs.x + obs.w &&
         player.x + player.w > obs.x &&
         player.y < obs.y + obs.h &&
         player.y + player.h > obs.y) {
-      alert("Game Over!");
-      location.reload();
+      gameOver();
     }
   }
 
-  // Score increase
   score++;
   if (score % 100 === 0) speed += 0.5;
 
   requestAnimationFrame(gameLoop);
+}
+
+function gameOver() {
+  alert("Game Over!");
+  showResetButton();
+}
+
+function showResetButton() {
+  document.getElementById('resetButton').style.display = 'block';
+}
+
+function resetGame() {
+  score = 0;
+  speed = 2;
+  obstacles = [];
+  player.y = 300;
+  player.vy = 0;
+  player.jump = false;
+  document.getElementById('resetButton').style.display = 'none';
+  gameRunning = true;
+  gameLoop();
 }
 
 gameLoop();
